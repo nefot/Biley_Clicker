@@ -1,9 +1,22 @@
 from tkinter import *
 from time import time
 from tkinter import messagebox as mb
+import global_vars
+
+def show_help():
+    mb.showinfo(message="жми кнопку быстреееееее")
+
+def show_record():
+    record = ""
+    with open('cliker_record.txt', 'r', encoding= "utf-8") as f:
+        record_list = f.readlines()
+        record = "".join(record_list)
+    mb.showinfo(message=record)
+def show_about():
+    mb.showinfo(message="долго делал.....")
 
 def cliker():
-    counter = 0
+    counter_counter = 0
     start = time()
     def chec_record(name: str, points: int) ->None:
         with open('cliker_record.txt', 'r+') as f:
@@ -24,21 +37,44 @@ def cliker():
             new_record_list[line_num][0] = str(line_num + 1)
             print(new_record_list)
     def on_click():
-        nonlocal counter , start
-        if time()-start<3:
-            counter += 1
-            lbl.config(text=f"Кликов\n{counter}")
+        if global_vars.cc ==0:
+            global_vars.sc = time()
+
+        start = time()
+        if time()-global_vars.sc<3:
+            global_vars.cc += 1
+            lbl.config(text=f"Кликов\n{ global_vars.cc}")
         else:
-            confirm = mb.showinfo(message=f'Хватит ЖАть!\nваш результат {counter}!')
+            confirm = mb.showinfo(message=f'Хватит ЖАть!\nваш результат { global_vars.cc}!')
             if confirm=="ok":
-                start = time()
-                counter = 0
+                global_vars.sc = time()
+                global_vars.cc = 0
 
     root = Tk()
     root.geometry('600x400')
     root.resizable(False, False)
     icon_img = PhotoImage(file="index.png")
     root.iconphoto(False, icon_img)
+    """
+    создаем главное меню
+    """
+    mainmenu = Menu(root)
+    root.config(menu = mainmenu)
+
+   # mainmenu.add_command(label = "выход", command = root.destroy)
+   # mainmenu.add_command(label = "cправка")
+
+
+    filemenu = Menu(mainmenu, tearoff = 0)
+    filemenu.add_command(label = "выход", command = root.destroy)
+
+    refmenu = Menu(mainmenu, tearoff = 1)
+    refmenu.add_command(label = "помощь", command = show_help)
+    refmenu.add_command(label="о программе", command=show_about)
+    refmenu.add_command(label="рекорды", command=show_record)
+
+    mainmenu.add_cascade(label = "файл", menu = filemenu)
+    mainmenu.add_cascade(label="справка", menu = refmenu)
 
 
     btn = Button(text = 'Жми сюда!',
@@ -62,7 +98,7 @@ def cliker():
 
 if __name__=="__main__":
 
-    #cliker()
+    cliker()
 
-    name = input('Enter player name ')
-    points = int(input('Enter points'))
+    # name = input('Enter player name ')
+    # points = int(input('Enter points'))
