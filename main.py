@@ -1,5 +1,6 @@
 from tkinter import *
 from time import time
+from PIL import ImageTk, Image
 from tkinter import messagebox as mb
 import global_vars
 
@@ -16,20 +17,22 @@ def show_about():
     mb.showinfo(message="долго делал.....")
 
 def cliker():
+    def entry_clear(z):
+        name_entry.delete(0, END)
     counter_counter = 0
     start = time()
     def chec_record(name: str, points: int) ->None:
         with open('cliker_record.txt', 'r+') as f:
 
             record_list = f.readlines()
-            new_record_list = [line.strip('\n').split() for line in record_list]
+            new_record_list = [line.strip('\n').split(";") for line in record_list]
             index = 0
             for line_num in new_record_list:
                 if points > int(line_num[2]):
                     new_record_list.insert(index, [str(index + 1), name, str(points)])
                     break
             for line_num in range(index + 1, len(new_record_list)):
-                record_list = [" ".join(i) + "\n" for i in new_record_list]
+                record_list = [";".join(i) + "\n" for i in new_record_list]
             f.seek(0)
 
             f.writelines(record_list)
@@ -46,6 +49,7 @@ def cliker():
             lbl.config(text=f"Кликов\n{ global_vars.cc}")
         else:
             confirm = mb.showinfo(message=f'Хватит ЖАть!\nваш результат { global_vars.cc}!')
+            chec_record(name_entry.get(),global_vars.cc)
             if confirm=="ok":
                 global_vars.sc = time()
                 global_vars.cc = 0
@@ -55,6 +59,11 @@ def cliker():
     root.resizable(False, False)
     icon_img = PhotoImage(file="index.png")
     root.iconphoto(False, icon_img)
+
+    bg = ImageTk.PhotoImage(file = 'wnd.jpg')
+    my_canvas = Canvas(root, width = 1000, height = 1000)
+    my_canvas.pack()
+    my_canvas.create_image(0,0, image = bg, anchor = 'center')
     """
     создаем главное меню
     """
@@ -92,8 +101,16 @@ def cliker():
               font=("Comic Sans", 15, 'bold'),
               width = 50,
               height = 3,)
-    lbl.pack()
-    btn.pack()
+
+    name_entry = Entry(root, width=20)
+    name_entry.insert(0,"username")
+    lbl.window = my_canvas.create_window(300,0, anchor = "n", window = lbl)
+    btn.window = my_canvas.create_window(300,50, anchor = "n", window = btn)
+    entry_window = my_canvas.create_window(300,300, anchor = "n", window = name_entry)
+    name_entry.bind("<Button1-1>", entry_clear)
+   # lbl.pack()
+   # btn.pack()
+
     root.mainloop()
 
 if __name__=="__main__":
